@@ -1,9 +1,11 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
-import { Grid, MenuItem, TextField, FormControl, Paper, IconButton, Box } from '@material-ui/core';
-
+import { Grid, FormControl, Paper, IconButton, Box, Modal } from '@material-ui/core';
+import React, { useState } from 'react';
 import SearchInput from './SearchInput/SearchInput';
 import useSearchValue from '../hooks/use-search-value';
+import AdvancedSearchModal from './AdvancedSearchModal';
+import SettingsIcon from '@material-ui/icons/Settings';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -53,7 +55,18 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: '5rem',
       },
     },
-    iconButton: {
+    modalStyle: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 400,
+      bgcolor: 'background.paper',
+      border: '2px solid #000',
+      boxShadow: '24',
+      p: 4,
+    },
+    searchIconButton: {
       backgroundColor: '#999999',
       '&:hover': {
         backgroundColor: theme.palette.secondary.dark,
@@ -66,6 +79,17 @@ const useStyles = makeStyles((theme: Theme) =>
       position: 'absolute',
       right: '10px',
       top: '6px',
+    },
+    gearIconButton: {
+      backgroundColor: '#999999',
+      '&:hover': {
+        backgroundColor: theme.palette.secondary.dark,
+      },
+      '& * > .MuiSvgIcon-root': {
+        fontSize: '2rem',
+        color: theme.palette.primary.contrastText,
+      },
+      width: 'fit-content',
     },
     selectControl: {
       '& > *': {
@@ -97,33 +121,40 @@ const SearchBar = () => {
 
   const searchOptions = ['post', 'author'];
 
+  const [modal, setModal] = useState(false);
+  const Toggle = () => setModal(!modal);
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   return (
     <Box className={classes.root}>
       <Paper component="form" className={classes.card} elevation={0}>
         <Grid container direction="row" spacing={2} alignItems="center" justifyContent="flex-start">
           <Grid item xs={12} sm={2} lg={2}>
-            <FormControl fullWidth>
-              <TextField
-                id="standard-select-search-type"
-                select
-                value={filter}
-                InputProps={{ disableUnderline: true }}
-                className={classes.selectControl}
-                onChange={(event) => onFilterChange(event.target.value)}
-              >
-                {searchOptions.map((option) => (
-                  <MenuItem key={option} value={option} className={classes.selectItem}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </FormControl>
+            <IconButton
+              className={classes.gearIconButton}
+              onClick={handleOpen}
+              aria-label="advanced-search-modal"
+            >
+              <SettingsIcon />
+            </IconButton>
+            <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              {/* <Box className={classes.modalStyle}></Box> */}
+              <AdvancedSearchModal />
+            </Modal>
           </Grid>
           <Grid item xs={12} sm={10} lg={10}>
             <FormControl fullWidth>
               <SearchInput />
               <IconButton
-                className={classes.iconButton}
+                className={classes.searchIconButton}
                 type="submit"
                 onClick={onSubmitHandler}
                 aria-label="search"
