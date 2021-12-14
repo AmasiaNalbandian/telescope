@@ -45,64 +45,16 @@ const calculateFrom = (page, perPage) => {
  * @return all the results matching the passed text
  */
 // Simple queries: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
-// const search = async (
-//   textToSearch,
-//   filter = 'post',
-//   page = 0,
-//   perPage = ELASTIC_MAX_RESULTS_PER_PAGE
-// ) => {
-//   const query = {
-//     query: {
-//       simple_query_string: {
-//         query: textToSearch,
-//         default_operator: 'and',
-//         fields: createFieldsFromFilter(filter),
-//       },
-//     },
-//     sort: sortFromFilter(filter),
-//   };
-
-//   const {
-//     body: { hits },
-//   } = await client.search({
-//     from: calculateFrom(page, perPage),
-//     size: perPage,
-//     _source: ['id'],
-//     index,
-//     type,
-//     body: query,
-//   });
-
-//   return {
-//     results: hits.total.value,
-//     values: hits.hits.map(({ _id }) => ({ id: _id, url: `${POSTS_URL}/${_id}` })),
-//   };
-// };
-
-/**
- * Searches date range in elasticsearch
- * @param textToSearch
- * @param filter
- * @return all the results matching the passed text
- * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_ranges
- */
-const search = async (filter = 'author', page = 0, perPage = ELASTIC_MAX_RESULTS_PER_PAGE) => {
+const search = async (
+  textToSearch,
+  filter = 'post',
+  page = 0,
+  perPage = ELASTIC_MAX_RESULTS_PER_PAGE
+) => {
   const query = {
     query: {
-      bool: {
-        should: [
-          {
-            bool: {
-              should: [
-                {
-                  match: {
-                    author: 'Amasia Nalbandian',
-                  },
-                },
-              ],
-            },
-          },
-        ],
+      terms: {
+        author: textToSearch,
       },
     },
     sort: sortFromFilter(filter),
@@ -124,4 +76,40 @@ const search = async (filter = 'author', page = 0, perPage = ELASTIC_MAX_RESULTS
     values: hits.hits.map(({ _id }) => ({ id: _id, url: `${POSTS_URL}/${_id}` })),
   };
 };
+
+/**
+ * Searches date range in elasticsearch
+ * @param textToSearch
+ * @param filter
+ * @return all the results matching the passed text
+ * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_ranges
+ */
+// const search = async (filter = 'author', page = 0, perPage = ELASTIC_MAX_RESULTS_PER_PAGE) => {
+//   const query = {
+//     query: {
+//       terms_set: {
+//         author: {
+//           terms: ['Amasia Nalbandian'],
+//         },
+//       },
+//     },
+//     sort: sortFromFilter(filter),
+//   };
+
+//   const {
+//     body: { hits },
+//   } = await client.search({
+//     from: calculateFrom(page, perPage),
+//     size: perPage,
+//     _source: ['id'],
+//     index,
+//     type,
+//     body: query,
+//   });
+
+//   return {
+//     results: hits.total.value,
+//     values: hits.hits.map(({ _id }) => ({ id: _id, url: `${POSTS_URL}/${_id}` })),
+//   };
+// };
 module.exports = search;
