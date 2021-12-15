@@ -53,8 +53,10 @@ const search = async (
 ) => {
   const query = {
     query: {
-      terms: {
-        author: textToSearch,
+      simple_query_string: {
+        query: textToSearch,
+        default_operator: 'and',
+        fields: createFieldsFromFilter(filter),
       },
     },
     sort: sortFromFilter(filter),
@@ -78,38 +80,80 @@ const search = async (
 };
 
 /**
- * Searches date range in elasticsearch
- * @param textToSearch
- * @param filter
- * @return all the results matching the passed text
- * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_ranges
+ * Advanced search allows you to look up multiple or single fields based on the input provided
+ * @param postText    - text to search in post field
+ * @param authorText  - text to search in author field
+ * @param titleText   - text to search in title field
+ * @param dateStart   - published after this date
+ * @param dateEnd     - published before this date
+ * @return all the results matching the fields text
+ * Range queries: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_ranges
+ * Match field queries: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-zero
  */
-// const search = async (filter = 'author', page = 0, perPage = ELASTIC_MAX_RESULTS_PER_PAGE) => {
-//   const query = {
-//     query: {
-//       terms_set: {
-//         author: {
-//           terms: ['Amasia Nalbandian'],
-//         },
-//       },
-//     },
-//     sort: sortFromFilter(filter),
-//   };
+const advancedSearch = async (
+  postText = '',
+  authorText = '',
+  titleText = '',
+  dateStart = '2000-01-01',
+  dateEnd = 'now',
+  page = 0,
+  perPage = ELASTIC_MAX_RESULTS_PER_PAGE
+) => {
+  const query = {
+    query: {
+      bool: {
+        must: [
+          {
+            match: {
+              author: {
+                query: authorText,
+                zero_terms_query: 'all',
+              },
+            },
+          },
+          {
+            match: {
+              text: {
+                query: postText,
+                zero_terms_query: 'all',
+              },
+            },
+          },
+          {
+            match: {
+              title: {
+                query: titleText,
+                zero_terms_query: 'all',
+              },
+            },
+          },
+          {
+            range: {
+              published: {
+                gte: dateStart,
+                lte: dateEnd,
+              },
+            },
+          },
+        ],
+      },
+    },
+  };
 
-//   const {
-//     body: { hits },
-//   } = await client.search({
-//     from: calculateFrom(page, perPage),
-//     size: perPage,
-//     _source: ['id'],
-//     index,
-//     type,
-//     body: query,
-//   });
+  const {
+    body: { hits },
+  } = await client.search({
+    from: calculateFrom(page, perPage),
+    size: perPage,
+    _source: ['id'],
+    index,
+    type,
+    body: query,
+  });
 
-//   return {
-//     results: hits.total.value,
-//     values: hits.hits.map(({ _id }) => ({ id: _id, url: `${POSTS_URL}/${_id}` })),
-//   };
-// };
-module.exports = search;
+  return {
+    results: hits.total.value,
+    values: hits.hits.map(({ _id }) => ({ id: _id, url: `${POSTS_URL}/${_id}` })),
+  };
+};
+module.exports = { search, advancedSearch };
