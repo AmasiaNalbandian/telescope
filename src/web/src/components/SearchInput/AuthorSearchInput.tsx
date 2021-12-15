@@ -28,16 +28,16 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const AuthorSearchInput = () => {
   const classes = useStyles();
-  const { text, onTextChange } = useSearchValue();
+  const { author, onAuthorChange } = useSearchValue();
 
   return (
     <>
       <input
         className={classes.input}
         list="search-suggestions"
-        placeholder="How to contribute to Open Source"
-        value={text}
-        onChange={(event) => onTextChange(event.target.value)}
+        placeholder="author"
+        value={author}
+        onChange={(event) => onAuthorChange(event.target.value)}
       />
 
       <datalist aria-label="search telescope" id="search-suggestions" />

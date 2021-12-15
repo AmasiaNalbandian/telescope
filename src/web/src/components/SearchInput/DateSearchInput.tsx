@@ -1,4 +1,6 @@
+import { Grid, TextField } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { Dispatch } from 'react';
 import useSearchValue from '../../hooks/use-search-value';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -23,21 +25,49 @@ const useStyles = makeStyles((theme: Theme) =>
       outline: 'none',
       color: theme.palette.text.primary,
     },
+    container: {
+      display: 'flex',
+      flexWrap: 'wrap',
+    },
   })
 );
 
 const DateSearchInput = () => {
   const classes = useStyles();
-  const { onTextChange } = useSearchValue();
-  const today = new Date().toISOString().split('T')[0];
-
+  const { startDate, endDate, onStartDateChange, onEndDateChange } = useSearchValue();
   return (
     <>
-      <input
+      {/* <input
         className={classes.input}
         placeholder={today}
         onChange={(event) => onTextChange(event.target.value)}
-      />
+      /> */}
+      <Grid item xs={12} sm={12}>
+        <form className={classes.container} noValidate>
+          <TextField
+            id="fromDate"
+            label="From"
+            type="date"
+            className={classes.input}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={startDate}
+            onChange={(event) => onStartDateChange(event.target.value)}
+          />
+          <TextField
+            id="toDate"
+            label="To"
+            type="date"
+            className={classes.input}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={endDate}
+            onChange={(event) => onEndDateChange(event.target.value)}
+          />
+        </form>
+      </Grid>
     </>
   );
 };

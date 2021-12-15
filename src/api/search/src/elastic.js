@@ -1,7 +1,11 @@
-const { ELASTIC_URL, ELASTIC_PORT } = process.env;
+// const { ELASTIC_URL, ELASTIC_PORT } = process.env;
 const { Client } = require('@elastic/elasticsearch');
 const Mock = require('@elastic/elasticsearch-mock');
 const { logger } = require('@senecacdot/satellite');
+
+// Temporary to test search without front end.
+const ELASTIC_PORT = 9200;
+const ELASTIC_URL = 'http://localhost';
 
 function MockClient(options) {
   const mock = new Mock();

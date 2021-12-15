@@ -124,16 +124,10 @@ const AdvancedSearch = (props: Props) => {
 
   const handleClose = () => {
     props.setOpenDialog(false);
-    setAdvancedSearchInAuthor(false);
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAdvancedSearchInAuthor(e.target.checked);
-  };
-
-  const handleSearch = (searchTerm: string) => {
-    if (advancedSearchInAuthor) router.push(`/search?text=${searchTerm}&filter=author`);
-    else router.push(`/search?text=${searchTerm}&filter=author`);
+  const handleSearch = () => {
+    // router.push(`/advance/?text=${searchTerm}&filter=author`);
   };
 
   return (
@@ -143,55 +137,47 @@ const AdvancedSearch = (props: Props) => {
       </DialogTitle>
 
       <DialogContent className={classes.dialogContent}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={2}>
-            <p>Author: </p>
-          </Grid>
-          <Grid item xs={12} sm={8}>
-            <FormControl
-              onSubmit={(e) => {
-                if (newSearchTerm) {
-                  e.preventDefault();
-                  handleSearch(newSearchTerm);
-                }
-                handleClose();
-              }}
-              fullWidth
-            >
-              <AuthorSearchInput />
-            </FormControl>
-          </Grid>
-        </Grid>
+        <FormControl
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSearch();
 
-        {/* Date range */}
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={2}>
-            <p>Date: </p>
+            handleClose();
+          }}
+          fullWidth
+        >
+          {/* Author */}
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={2}>
+              <p>Author: </p>
+            </Grid>
+            <Grid item xs={12} sm={8}>
+              <AuthorSearchInput />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={8}>
-            <FormControl
-              onSubmit={(e) => {
-                if (newSearchTerm) {
-                  e.preventDefault();
-                  handleSearch(newSearchTerm);
-                }
-                handleClose();
-              }}
-              fullWidth
-            >
-              <DateSearchInput />
-            </FormControl>
+
+          {/* Date range */}
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={2}>
+              <p>Post: </p>
+            </Grid>
+            <Grid item xs={12} sm={8}>
+              <PostSearchInput />
+            </Grid>
           </Grid>
-        </Grid>
+          {/* Date range */}
+          <Grid container>
+            <DateSearchInput />
+          </Grid>
+        </FormControl>
       </DialogContent>
       <DialogActions>
         <button
           className={classes.searchButton}
           onClick={(e) => {
-            if (newSearchTerm) {
-              e.preventDefault();
-              handleSearch(newSearchTerm);
-            }
+            e.preventDefault();
+            handleSearch();
+
             handleClose();
           }}
         >

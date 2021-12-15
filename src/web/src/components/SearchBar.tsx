@@ -5,6 +5,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import { Grid, FormControl, IconButton, Box, Button } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 import AdvancedSearch from './AdvancedSearch';
+import PostSearchInput from './SearchInput/PostSearchInput';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -84,7 +85,7 @@ const SearchBar = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [dataToDialog, setDataToDialog] = useState('');
 
-  const { text, onTextChange, onSubmitHandler } = useSearchValue();
+  const { post, onPostChange, onSubmitHandler } = useSearchValue();
 
   function handleFocus() {
     if (searchInput && searchInput.current) {
@@ -98,19 +99,19 @@ const SearchBar = () => {
       <Box className={classes.root}>
         <FormControl fullWidth>
           <Grid item xs={12} sm={10} lg={10}>
-            <form onSubmit={(e) => onSubmitHandler(e)}>
+            <form>
               <input
                 autoFocus
                 ref={searchInput}
                 className={classes.input}
-                value={text}
+                value={post}
                 placeholder="Search..."
-                onChange={(e) => onTextChange(e.target.value)}
+                onChange={(e) => onPostChange(e.target.value)}
               />
 
               <IconButton
                 onClick={(e) => {
-                  if (text) onSubmitHandler(e);
+                  // if (post) onSubmitHandler(e);
                 }}
                 className={classes.iconButton}
                 aria-label="search"
@@ -118,11 +119,11 @@ const SearchBar = () => {
                 <SearchIcon />
               </IconButton>
 
-              {text && (
+              {post && (
                 <IconButton
                   className={classes.clearIcon}
                   onClick={() => {
-                    onTextChange('');
+                    onPostChange('');
                     handleFocus();
                   }}
                   aria-label="clear"

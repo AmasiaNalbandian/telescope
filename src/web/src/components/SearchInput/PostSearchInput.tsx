@@ -30,15 +30,15 @@ const useStyles = makeStyles((theme: Theme) =>
 const PostSearchInput = () => {
   const classes = useStyles();
 
-  const { text, onTextChange } = useSearchValue();
+  const { post, onPostChange } = useSearchValue();
 
   return (
     <>
       <input
         className={classes.input}
-        placeholder="How to contribute to Open Source"
-        value={text}
-        onChange={(event) => onTextChange(event.target.value)}
+        placeholder="Today in my blog I will "
+        value={post}
+        onChange={(event) => onPostChange(event.target.value)}
       />
     </>
   );
