@@ -31,8 +31,26 @@ const queryValidationRules = [
     .bail(),
 ];
 
-const validateQuery = (rules) => {
+// TODO:
+const advancedQueryValidationRules = [
+  // Check at least one field provided
+  // check.oneOf(['postText', 'authorText', 'titleText', 'dateStart', 'dateEnd']),
+];
+
+/**
+ * Validates query by passing rules. The rules are different based on the pathname
+ * of the request. If the pathname is '/' it is the basic route.
+ * Otherwise, if '/advanced/' it is the advanced search
+ */
+const validateQuery = () => {
+  // if text exists, this is not an advanced search
   return async (req, res, next) => {
+    // check if it's advanced or not
+    // If it's advanced it will be '/advanced/' for pathname, if its basic it's '/'
+    const rules =
+      req._parsedUrl.pathname === '/' ? queryValidationRules : advancedQueryValidationRules;
+
+    console.log('req params', req.query);
     await Promise.all(rules.map((rule) => rule.run(req)));
 
     const result = validationResult(req);
@@ -45,4 +63,4 @@ const validateQuery = (rules) => {
   };
 };
 
-module.exports.validateQuery = validateQuery(queryValidationRules);
+module.exports.validateQuery = validateQuery();
