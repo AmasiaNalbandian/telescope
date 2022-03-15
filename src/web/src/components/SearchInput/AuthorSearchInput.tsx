@@ -28,15 +28,15 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const AuthorSearchInput = () => {
   const classes = useStyles();
-  const { text, onTextChange } = useSearchValue();
+  const { author, onAuthorChange } = useSearchValue();
 
   return (
     <>
       <input
         className={classes.input}
-        placeholder="How to contribute to Open Source"
-        value={text}
-        onChange={(event) => onTextChange(event.target.value)}
+        placeholder="Bob Smith"
+        value={author}
+        onChange={(event) => onAuthorChange(event.target.value)}
       />
     </>
   );

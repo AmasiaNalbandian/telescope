@@ -2,6 +2,7 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import useSWRInfinite from 'swr/infinite';
 import { Container, Box, createStyles } from '@material-ui/core';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 import { searchServiceUrl } from '../config';
 import Timeline from './Posts/Timeline';
@@ -55,22 +56,27 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const SearchResults = () => {
   const classes = useStyles();
-  const { textParam, filter, toggleHelp } = useSearchValue();
+  const router = useRouter();
+  const { post, author, toggleHelp } = useSearchValue();
   const [totalPosts, setTotalPosts] = useState(0);
 
   const prepareUrl = (index: number) =>
-    `${searchServiceUrl}?${filter === 'author' ? `author` : `post`}=${encodeURIComponent(
-      textParam
+    `${searchServiceUrl}/?author=${encodeURIComponent(author)}&post=${encodeURIComponent(
+      post
     )}&page=${index}`;
 
   // We only bother doing the request if we have something to search for.
-  const shouldFetch = () => textParam.length > 0;
+  const shouldFetch = () => post.length > 1 || author.length > 1;
   const { data, size, setSize, error } = useSWRInfinite(
     (index: number) => (shouldFetch() ? prepareUrl(index) : null),
     async (u: string) => {
       const res = await fetch(u);
       const results = await res.json();
-
+      router.push(
+        `/search?${author ? `author=${author}${post ? `&post=${post}` : ``}` : ``}${
+          !author && post ? `post=${post}` : ``
+        }`
+      );
       setTotalPosts(results.results);
       return results.values;
     }
@@ -85,7 +91,7 @@ const SearchResults = () => {
     !isReachingEnd && data && size > 0 && typeof data[size - 1] === 'undefined';
 
   // If there is no posts or if the search bar is empty, then show the search help, otherwise hide it
-  if (!error && (isEmpty || textParam.length === 0)) {
+  if (!error && (isEmpty || (post.length === 0 && author.length === 0))) {
     toggleHelp(true);
   } else {
     toggleHelp(false);
@@ -108,7 +114,7 @@ const SearchResults = () => {
     );
   }
 
-  if (textParam.length && loading) {
+  if ((post.length || author.length) && loading) {
     return (
       <Container className={classes.searchResults}>
         <h1 className={classes.spinner}>
