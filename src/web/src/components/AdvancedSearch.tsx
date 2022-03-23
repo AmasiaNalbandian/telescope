@@ -21,7 +21,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     customInput: {
       borderRadius: `4rem 4rem 4rem 4rem`,
-      background: theme.palette.background.default,
       borderColor: theme.palette.info.main,
       borderWidth: `2px`,
       transition: theme.transitions.create(['background-color', 'border-color'], {
@@ -30,9 +29,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     customInputText: {
       color: theme.palette.text.primary,
-    },
-    customInputTextDark: {
-      color: theme.palette.text.secondary,
     },
   })
 );
@@ -68,7 +64,7 @@ const AdvancedSearch = (props: Props) => {
                 InputLabelProps={{
                   classes: {
                     root: classes.customInputText,
-                    focused: classes.customInputTextDark,
+                    focused: classes.customInputText,
                   },
                 }}
               />
