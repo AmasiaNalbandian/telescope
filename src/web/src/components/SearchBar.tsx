@@ -23,16 +23,9 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
       alignItems: 'center',
       borderRadius: '50px',
-      background: 'rgba(160,209,250, 0.4)',
-      border: 'solid 2px #121D59',
+      background: theme.palette.background.default,
+      border: `2px solid ${theme.palette.info.main}`,
       transition: 'background-color .5s',
-      '&:hover': {
-        border: 'solid 2px #121D59',
-      },
-      [theme.breakpoints.down('xs')]: {
-        borderRadius: '15px',
-        padding: theme.spacing(0, 0, 0, 2),
-      },
     },
     header: {
       padding: 0,
@@ -55,9 +48,9 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     iconButton: {
-      backgroundColor: '#121D59',
+      backgroundColor: theme.palette.info.main,
       '&:hover': {
-        backgroundColor: theme.palette.secondary.dark,
+        backgroundColor: theme.palette.info.light,
       },
       '& * > .MuiSvgIcon-root': {
         fontSize: '2rem',
@@ -89,14 +82,13 @@ const useStyles = makeStyles((theme: Theme) =>
       textTransform: 'capitalize',
     },
     advanceSearchButton: {
-      position: 'relative',
-      left: '65rem',
+      float: 'right',
       width: 'auto',
       padding: '5px 10px',
       outline: 'none',
       border: 'none',
       background: 'transparent',
-      color: '#000000',
+      color: theme.palette.info.main,
       fontSize: '10px',
       cursor: 'pointer',
       '&:hover': {

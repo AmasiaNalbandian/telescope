@@ -18,8 +18,7 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'center',
     },
     searchResults: {
-      padding: 0,
-      width: '100%',
+      width: '81vw',
       justifyContent: 'center',
     },
     errorBackground: {
