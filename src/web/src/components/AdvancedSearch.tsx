@@ -57,6 +57,7 @@ const AdvancedSearch = (props: Props) => {
                 fullWidth
                 label="Author"
                 onChange={(event) => onAuthorChange(event.target.value)}
+                value={author}
                 InputProps={{
                   classes: {
                     root: classes.customInput,
