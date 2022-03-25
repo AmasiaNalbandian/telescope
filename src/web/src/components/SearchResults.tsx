@@ -1,7 +1,7 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import useSWRInfinite from 'swr/infinite';
 import { Container, Box, createStyles } from '@material-ui/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { searchServiceUrl } from '../config';
@@ -55,8 +55,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const SearchResults = () => {
   const classes = useStyles();
-  const router = useRouter();
-  const { post, author, toggleHelp } = useSearchValue();
+  const { post, author, toggleHelp, shouldSearch, toggleSearch } = useSearchValue();
   const [totalPosts, setTotalPosts] = useState(0);
 
   const prepareUrl = (index: number) =>
@@ -65,22 +64,23 @@ const SearchResults = () => {
     )}&page=${index}`;
 
   // We only bother doing the request if we have something to search for.
-  const shouldFetch = () => post.length > 1 || author.length > 1;
   const { data, size, setSize, error } = useSWRInfinite(
-    (index: number) => (shouldFetch() ? prepareUrl(index) : null),
+    (index: number) => (shouldSearch ? prepareUrl(index) : null),
     async (u: string) => {
       const res = await fetch(u);
       const results = await res.json();
-      router.push(
-        `/search?${author ? `author=${author}${post ? `&post=${post}` : ``}` : ``}${
-          !author && post ? `post=${post}` : ``
-        }`
-      );
       setTotalPosts(results.results);
       return results.values;
     }
   );
-  const loading = !data && !error;
+
+  useEffect(() => {
+    toggleSearch(false);
+
+    console.log('use effect');
+  }, [author, post]);
+
+  const loading = !data && !error && shouldSearch;
   // Search result is empty when the the array of posts on the first page is empty
   const isEmpty = data?.[0]?.length === 0;
   // There no more posts when the last page has no posts
@@ -90,13 +90,15 @@ const SearchResults = () => {
     !isReachingEnd && data && size > 0 && typeof data[size - 1] === 'undefined';
 
   // If there is no posts or if the search bar is empty, then show the search help, otherwise hide it
-  if (!error && (isEmpty || (post.length === 0 && author.length === 0))) {
+  if (!error && isEmpty && (!author.length || !post.length)) {
     toggleHelp(true);
   } else {
     toggleHelp(false);
   }
 
   if (error) {
+    console.log('bucket 3');
+
     return (
       <Container className={classes.searchResults}>
         <Box boxShadow={2} marginTop={10}>
@@ -113,7 +115,9 @@ const SearchResults = () => {
     );
   }
 
-  if ((post.length || author.length) && loading) {
+  if (loading) {
+    console.log('bucket 2');
+
     return (
       <Container className={classes.searchResults}>
         <h1 className={classes.spinner}>
@@ -123,10 +127,12 @@ const SearchResults = () => {
     );
   }
 
-  if (data === undefined) {
-    return null;
-  }
+  // if (data === undefined) {
+  //   console.log('bucket 1');
+  //   return null;
+  // }
 
+  console.log('bucket 4');
   return (
     <Container className={classes.searchResults}>
       {!isEmpty ? (
