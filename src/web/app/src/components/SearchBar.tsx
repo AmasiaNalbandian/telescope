@@ -1,9 +1,11 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
-import { Grid, MenuItem, TextField, FormControl, Paper, IconButton, Box } from '@material-ui/core';
+import { Grid, FormControl, Paper, IconButton, Box, Button } from '@material-ui/core';
 
-import SearchInput from './SearchInput/SearchInput';
+import { useState } from 'react';
+import PostSearchInput from './SearchInput/PostSearchInput';
 import useSearchValue from '../hooks/use-search-value';
+import AdvancedSearch from './AdvancedSearch';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -21,17 +23,9 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
       alignItems: 'center',
       borderRadius: '50px',
-      background: theme.palette.background.paper,
-      border: 'solid 1px transparent',
+      background: theme.palette.background.default,
+      border: `2px solid ${theme.palette.info.main}`,
       transition: 'background-color .5s',
-      '&:hover': {
-        backgroundColor: theme.palette.background.default,
-        border: 'solid 1px #999999',
-      },
-      [theme.breakpoints.down('xs')]: {
-        borderRadius: '15px',
-        padding: theme.spacing(0, 0, 0, 2),
-      },
     },
     header: {
       padding: 0,
@@ -54,9 +48,9 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     iconButton: {
-      backgroundColor: '#999999',
+      backgroundColor: theme.palette.info.main,
       '&:hover': {
-        backgroundColor: theme.palette.secondary.dark,
+        backgroundColor: theme.palette.info.light,
       },
       '& * > .MuiSvgIcon-root': {
         fontSize: '2rem',
@@ -65,7 +59,9 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: 0,
       position: 'absolute',
       right: '10px',
-      top: '6px',
+      top: '10px',
+      padding: '8px',
+      color: '#A0D1FA',
     },
     selectControl: {
       '& > *': {
@@ -73,7 +69,6 @@ const useStyles = makeStyles((theme: Theme) =>
         transform: 'translateY(2px)',
         fontSize: '1.5rem',
         textTransform: 'capitalize',
-        color: theme.palette.primary.main,
         paddingLeft: '2rem',
         [theme.breakpoints.down('xs')]: {
           paddingLeft: '1rem',
@@ -85,55 +80,55 @@ const useStyles = makeStyles((theme: Theme) =>
     selectItem: {
       fontSize: '1.4rem',
       textTransform: 'capitalize',
-      color: theme.palette.primary.main,
+    },
+    advanceSearchButton: {
+      float: 'right',
+      width: 'auto',
+      padding: '5px 10px',
+      outline: 'none',
+      border: 'none',
+      background: 'transparent',
+      color: theme.palette.info.main,
+      fontSize: '10px',
+      cursor: 'pointer',
+      '&:hover': {
+        textDecoration: 'underline',
+      },
     },
   })
 );
 
 const SearchBar = () => {
   const classes = useStyles();
-
-  const { filter, onFilterChange, onSubmitHandler } = useSearchValue();
-
-  const searchOptions = ['post', 'author'];
+  const [openDialog, setOpenDialog] = useState(false);
+  const { onSubmitHandler } = useSearchValue();
 
   return (
     <Box className={classes.root}>
       <Paper component="form" className={classes.card} elevation={0}>
         <Grid container direction="row" spacing={2} alignItems="center" justifyContent="flex-start">
-          <Grid item xs={12} sm={2} lg={2}>
-            <FormControl fullWidth>
-              <TextField
-                id="standard-select-search-type"
-                select
-                value={filter}
-                InputProps={{ disableUnderline: true }}
-                className={classes.selectControl}
-                onChange={(event) => onFilterChange(event.target.value)}
-              >
-                {searchOptions.map((option) => (
-                  <MenuItem key={option} value={option} className={classes.selectItem}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={10} lg={10}>
-            <FormControl fullWidth>
-              <SearchInput />
-              <IconButton
-                className={classes.iconButton}
-                type="submit"
-                onClick={onSubmitHandler}
-                aria-label="search"
-              >
-                <SearchIcon />
-              </IconButton>
-            </FormControl>
-          </Grid>
+          <FormControl fullWidth>
+            <PostSearchInput />
+            <IconButton
+              className={classes.iconButton}
+              type="submit"
+              onClick={onSubmitHandler}
+              aria-label="search"
+            >
+              <SearchIcon />
+            </IconButton>
+          </FormControl>
         </Grid>
       </Paper>
+      <Button
+        className={classes.advanceSearchButton}
+        onClick={() => {
+          setOpenDialog(!openDialog);
+        }}
+      >
+        Advanced Search
+      </Button>
+      <AdvancedSearch openDialog={openDialog} />
     </Box>
   );
 };

@@ -1,8 +1,10 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import useSWRInfinite from 'swr/infinite';
 import { Container, Box, createStyles } from '@material-ui/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
+import { Router } from 'express';
 import { searchServiceUrl } from '../config';
 import Timeline from './Posts/Timeline';
 import Spinner from './Spinner';
@@ -17,8 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'center',
     },
     searchResults: {
-      padding: 0,
-      width: '100%',
+      width: '81vw',
       justifyContent: 'center',
     },
     errorBackground: {
@@ -55,27 +56,41 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const SearchResults = () => {
   const classes = useStyles();
-  const { textParam, filter, toggleHelp } = useSearchValue();
+  const { post, author, toggleHelp, toggleSearch } = useSearchValue();
   const [totalPosts, setTotalPosts] = useState(0);
+  const router = useRouter();
 
   const prepareUrl = (index: number) =>
-    `${searchServiceUrl}?${filter === 'author' ? `author` : `post`}=${encodeURIComponent(
-      textParam
+    `${searchServiceUrl}/?author=${encodeURIComponent(author)}&post=${encodeURIComponent(
+      post
     )}&page=${index}`;
 
   // We only bother doing the request if we have something to search for.
-  const shouldFetch = () => textParam.length > 0;
+  const shouldSearch =
+    router.query.author != null &&
+    router.query.author === author &&
+    router.query.post != null &&
+    router.query.post === post;
+  console.log(
+    `author: ${author}, author req: ${router.query.author} post: ${post}, post req: ${router.query.post}, should search: ${shouldSearch}`
+  );
   const { data, size, setSize, error } = useSWRInfinite(
-    (index: number) => (shouldFetch() ? prepareUrl(index) : null),
+    (index: number) => (shouldSearch ? prepareUrl(index) : null),
     async (u: string) => {
       const res = await fetch(u);
       const results = await res.json();
-
       setTotalPosts(results.results);
       return results.values;
     }
   );
-  const loading = !data && !error;
+
+  // useEffect(() => {
+  //   toggleSearch(false);
+
+  //   console.log('use effect');
+  // }, [author, post]);
+
+  const loading = !data && !error && shouldSearch;
   // Search result is empty when the the array of posts on the first page is empty
   const isEmpty = data?.[0]?.length === 0;
   // There no more posts when the last page has no posts
@@ -85,13 +100,15 @@ const SearchResults = () => {
     !isReachingEnd && data && size > 0 && typeof data[size - 1] === 'undefined';
 
   // If there is no posts or if the search bar is empty, then show the search help, otherwise hide it
-  if (!error && (isEmpty || textParam.length === 0)) {
+  if (!error && isEmpty && (!author.length || !post.length)) {
     toggleHelp(true);
   } else {
     toggleHelp(false);
   }
 
   if (error) {
+    console.log('bucket 3');
+
     return (
       <Container className={classes.searchResults}>
         <Box boxShadow={2} marginTop={10}>
@@ -108,7 +125,9 @@ const SearchResults = () => {
     );
   }
 
-  if (textParam.length && loading) {
+  if (loading) {
+    console.log('bucket 2');
+
     return (
       <Container className={classes.searchResults}>
         <h1 className={classes.spinner}>
@@ -119,9 +138,12 @@ const SearchResults = () => {
   }
 
   if (data === undefined) {
+    console.log('bucket 1');
     return null;
   }
 
+  console.log('bucket 4');
+  toggleSearch(false);
   return (
     <Container className={classes.searchResults}>
       {!isEmpty ? (
