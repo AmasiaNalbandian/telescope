@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { IconButton, TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
-import AuthorInput from './AuthorInput';
+import { DateRangePicker } from '@mui/x-date-pickers/DatePicker';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -56,51 +56,39 @@ interface SearchInputInterface {
   labelFor: string;
   clickEvent?: any;
   onEnterKey?: any;
-  type?: 'date' | 'text';
 }
 
-const SearchInput = ({
-  text,
-  setText,
-  labelFor,
-  clickEvent,
-  onEnterKey,
-  type = 'text',
-}: SearchInputInterface) => {
+const DateInput = ({ text, setText, labelFor, clickEvent, onEnterKey }: SearchInputInterface) => {
   const classes = useStyles();
 
   return (
     <div className={classes.wrapper}>
-      {labelFor === 'Look for an Author' ? (
-        <AuthorInput text={text} setText={setText} labelFor={labelFor} />
-      ) : (
-        <TextField
-          variant="outlined"
-          type={type}
-          size="medium"
-          fullWidth
-          label={labelFor}
-          onChange={(event) => setText(event.target.value)}
-          defaultValue={text}
-          InputProps={{
-            classes: {
-              root: classes.customInput,
-              focused: classes.customInput,
-              notchedOutline: classes.customInput,
-            },
-          }}
-          InputLabelProps={{
-            classes: {
-              root: classes.customInputText,
-              focused: classes.customInputText,
-            },
-          }}
-          className="Mui-focused"
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') onEnterKey();
-          }}
-        />
-      )}
+      <TextField
+        variant="outlined"
+        type="date"
+        size="medium"
+        fullWidth
+        label={labelFor}
+        onChange={(event: any) => setText(event.target.value)}
+        value={text}
+        InputProps={{
+          classes: {
+            root: classes.customInput,
+            focused: classes.customInput,
+            notchedOutline: classes.customInput,
+          },
+        }}
+        InputLabelProps={{
+          classes: {
+            root: classes.customInputText,
+            focused: classes.customInputText,
+          },
+        }}
+        onKeyDown={(event: { key: string }) => {
+          if (event.key === 'Enter') onEnterKey();
+        }}
+      />
+
       {clickEvent && (
         <IconButton
           className={classes.iconButton}
@@ -115,4 +103,4 @@ const SearchInput = ({
   );
 };
 
-export default SearchInput;
+export default DateInput;

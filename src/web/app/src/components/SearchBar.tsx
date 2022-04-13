@@ -2,8 +2,9 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 import SearchIcon from '@material-ui/icons/Search';
 import { Box, Button } from '@material-ui/core';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState, SetStateAction } from 'react';
 import SearchInput from './SearchInput/SearchInput';
+import DateInput from './SearchInput/DateInput';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -122,11 +123,16 @@ const useStyles = makeStyles((theme: Theme) =>
 const SearchBar = () => {
   const classes = useStyles();
   const router = useRouter();
+  // States for all the fields
+  const d = new Date();
   const [openDialog, setOpenDialog] = useState(false);
   const [author, setAuthor] = useState('');
   const [post, setPost] = useState('');
   const [title, setTitle] = useState('');
+  const [toDate, setToDate] = useState(Date().toString());
+  const [fromDate, setFromDate] = useState('2020-08-18');
 
+  // Params retrieved from the URL to indicate a new search is being requested.
   const postParam = Array.isArray(router.query.post)
     ? router.query.post[0]
     : router.query.post || '';
@@ -139,6 +145,12 @@ const SearchBar = () => {
     ? router.query.title[0]
     : router.query.title || '';
 
+  const toParam = Array.isArray(router.query.to) ? router.query.to[0] : router.query.to || '';
+
+  const fromParam = Array.isArray(router.query.from)
+    ? router.query.from[0]
+    : router.query.from || '';
+
   const onSubmitHandler = (event: FormEvent) => {
     event?.preventDefault();
 
@@ -148,6 +160,8 @@ const SearchBar = () => {
     if (author) parameters.append('author', author);
     if (post) parameters.append('post', post);
     if (title) parameters.append('title', title);
+    if (toDate) parameters.append('to', toDate.toString());
+    if (fromDate) parameters.append('from', fromDate.toString());
 
     router.push(`/search?${parameters}`);
   };
@@ -156,13 +170,17 @@ const SearchBar = () => {
   const resetAdvancedFields = () => {
     setAuthor('');
     setTitle('');
+    setToDate(Date().toString());
+    setFromDate(Date().toString());
   };
 
   useEffect(() => {
     setPost(postParam);
     setAuthor(authorParam);
     setTitle(titleParam);
-  }, [postParam, authorParam, titleParam]);
+    // setToDate(Date(toParam));
+    // setFromDate(Date(fromParam));
+  }, [postParam, authorParam, titleParam, fromParam, toParam]);
 
   return (
     <Box className={classes.root}>
@@ -182,6 +200,15 @@ const SearchBar = () => {
               setText={setTitle}
               labelFor="The blog title was..."
               onEnterKey={(e: FormEvent) => onSubmitHandler(e)}
+            />
+          </div>
+          <div className={classes.advancedSearchInputDiv}>
+            <SearchInput
+              text={fromDate}
+              setText={setFromDate}
+              labelFor="From Date"
+              onEnterKey={(e: FormEvent) => onSubmitHandler(e)}
+              type="date"
             />
           </div>
           <div className={classes.advancedSearchInputDiv}>
